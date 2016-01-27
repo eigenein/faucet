@@ -3,26 +3,38 @@
 
 import logging
 import pathlib
+import pickle
+import time
 
 import click
+import redis
 import tornado.ioloop
 import tornado.template
 import tornado.web
 
 
 class Configuration:
+    # Coinbase API endpoints.
     COINBASE_API_ENDPOINT = "https://api.coinbase.com/v2/"
     COINBASE_API_ENDPOINT_SANDBOX = "https://api.sandbox.coinbase.com/"
+    # Coinbase API key.
     COINBASE_API_KEY = "dOjIYwTJClFK7pt6"
     COINBASE_API_SECRET = "yHnBgl62iUkpVGEs6NTUCoabejWsyP1D"
+    # Cookies.
+    COOKIE_LAST_EARN_TIMESTAMP = "let"
     COOKIE_SECRET = b"One wallet to rule them all"
+    # Web server.
     HTTP_PORT = 8080
+    # Logging.
     LOG_FORMAT = " ".join((
         click.style("%(asctime)s", dim=True),
         click.style("%(module)s", fg="green"),
         click.style("[%(levelname)s]", fg="cyan"),
         click.style("%(message)s", bold=True),
     ))
+    # Game balance.
+    EARN_WAIT_TIME_MINUTES = 10
+    EARN_WAIT_TIME = 60.0 * EARN_WAIT_TIME_MINUTES
 
 
 class Application(tornado.web.Application):
@@ -47,16 +59,33 @@ class Application(tornado.web.Application):
 
 class HomeRequestHandler(tornado.web.RequestHandler):
 
-    LAST_SENT_TIMESTAMP_COOKIE = "lst"
-
     @tornado.web.removeslash
     def get(self):
         # TODO: test and set cookie.
-        self.render("home.html")
+        self.handle()
 
     def post(self):
         # TODO: test cookie, test anti-robot, send money and set cookie.
-        self.render("home.html")
+        self.set_secure_cookie(Configuration.COOKIE_LAST_EARN_TIMESTAMP, time.time())
+        self.handle()
+
+    def handle(self):
+        """
+        We return the same response for both GET and POST.
+        This method contains the shared logic.
+        """
+        last_earn_datetime = self.get_last_earn_time()
+        self.render(
+            "home.html",
+            configuration=Configuration,
+        )
+
+    def get_last_earn_time(self) -> float:
+        """
+        Reads the cookie and gets last earn timestamp
+        """
+        cookie = self.get_secure_cookie(Configuration.COOKIE_LAST_EARN_TIMESTAMP)
+        return pickle.loads(cookie) if cookie else 0
 
 
 @click.command()
