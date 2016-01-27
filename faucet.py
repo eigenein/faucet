@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import http
 import logging
 import pathlib
 import pickle
@@ -33,22 +34,22 @@ class Configuration:
         click.style("%(message)s", bold=True),
     ))
     # Game balance.
-    EARN_WAIT_TIME_MINUTES = 10
-    EARN_WAIT_TIME = 60.0 * EARN_WAIT_TIME_MINUTES
+    EARN_WAITING_TIME_MINUTES = 1
+    EARN_WAITING_TIME = 60.0 * EARN_WAITING_TIME_MINUTES
+    # Redis.
+    REDIS_EARN_TIME_EXPIRE = 24 * 60 * 60
+    REDIS_EARN_TIME_KEY_FORMAT = "faucet:%s:earn_time"
 
 
 class Application(tornado.web.Application):
 
-    def __init__(self):
+    def __init__(self, database: redis.StrictRedis):
         template_path = pathlib.Path(__file__).absolute().parent
         favicon_path = pathlib.Path(__file__).absolute().parent / "favicomatic"
 
-        logging.debug("Template path is set to: %s", template_path)
-        logging.debug("Favicon path is set to: %s", favicon_path)
-
         super().__init__(
             [
-                (r"/", HomeRequestHandler),
+                (r"/", HomeRequestHandler, {"database": database}),
                 (r"/((apple-touch-icon|favicon|mstile).*)", tornado.web.StaticFileHandler, {"path": str(favicon_path)}),
             ],
             cookie_secret=Configuration.COOKIE_SECRET,
@@ -59,33 +60,67 @@ class Application(tornado.web.Application):
 
 class HomeRequestHandler(tornado.web.RequestHandler):
 
+    # noinspection PyMethodOverriding
+    def initialize(self, database: redis.StrictRedis):
+        # noinspection PyAttributeOutsideInit
+        self.database = database
+
     @tornado.web.removeslash
     def get(self):
-        # TODO: test and set cookie.
-        self.handle()
+        self.handle(self.get_cookie_waiting_time())
 
     def post(self):
-        # TODO: test cookie, test anti-robot, send money and set cookie.
-        self.set_secure_cookie(Configuration.COOKIE_LAST_EARN_TIMESTAMP, time.time())
-        self.handle()
+        if self.get_body_argument("c") != "js":
+            # This is either a robot or a human with disabled JavaScript.
+            raise tornado.web.HTTPError(http.HTTPStatus.BAD_REQUEST.value, "Are you a bot?")
 
-    def handle(self):
+        wallet_address = self.get_body_argument("wallet_address")
+        wallet_key = Configuration.REDIS_EARN_TIME_KEY_FORMAT % wallet_address
+
+        # Check waiting time.
+        waiting_time = self.get_cookie_waiting_time()
+        if waiting_time > 0.0:
+            self.handle(waiting_time)
+            return
+        wallet_cookie = self.database.get(wallet_key)
+        if wallet_cookie:
+            waiting_time = self.get_waiting_time(pickle.loads(wallet_cookie))
+            if waiting_time > 0.0:
+                self.handle(waiting_time)
+                return
+
+        # TODO: send money.
+        logging.info("Send money to %s.", wallet_address)
+
+        # Remember last earn time for the wallet and cookie.
+        cookie = pickle.dumps(time.time())
+        self.database.set(wallet_key, cookie, ex=Configuration.REDIS_EARN_TIME_EXPIRE)
+        self.set_secure_cookie(Configuration.COOKIE_LAST_EARN_TIMESTAMP, cookie)
+
+        # Render the page. We now that we've just sent money.
+        self.handle(Configuration.EARN_WAITING_TIME)
+
+    def handle(self, waiting_time: float):
         """
         We return the same response for both GET and POST.
         This method contains the shared logic.
         """
-        last_earn_datetime = self.get_last_earn_time()
         self.render(
             "home.html",
             configuration=Configuration,
+            waiting_time=waiting_time,
         )
 
-    def get_last_earn_time(self) -> float:
+    def get_cookie_waiting_time(self) -> float:
         """
-        Reads the cookie and gets last earn timestamp
+        Reads the cookie and gets remaining wait time.
         """
         cookie = self.get_secure_cookie(Configuration.COOKIE_LAST_EARN_TIMESTAMP)
-        return pickle.loads(cookie) if cookie else 0
+        return self.get_waiting_time(pickle.loads(cookie) if cookie else 0)
+
+    @staticmethod
+    def get_waiting_time(earn_time: float) -> float:
+        return earn_time + Configuration.EARN_WAITING_TIME - time.time()
 
 
 @click.command()
@@ -103,7 +138,7 @@ def main(log_file, verbose: bool):
     )
 
     logging.info("Starting application on port %s…", Configuration.HTTP_PORT)
-    Application().listen(Configuration.HTTP_PORT)
+    Application(redis.StrictRedis()).listen(Configuration.HTTP_PORT)
     tornado.ioloop.IOLoop.current().start()
 
 

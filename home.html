@@ -85,8 +85,12 @@
             <div class="container _half-width">
               <h1>{{ title }}</h1>
               <p>
-                Enter you <a href="https://bitcoin.org" target="_blank">Bitcoin</a> wallet address and earn a few <abbr title="1 Bit is 0.000001 BTC">Bits</abbr> instantly.<sup>1</sup><br>
-                You can do that over and over each {{ configuration.EARN_WAIT_TIME_MINUTES }} minutes.
+                {% if waiting_time < 0 %}
+                Enter your <a href="https://bitcoin.org" target="_blank">Bitcoin</a> wallet address and earn a few <abbr title="1 Bit is 0.000001 BTC">Bits</abbr> instantly.<sup>1</sup><br>
+                You can do that over and over each {{ configuration.EARN_WAITING_TIME_MINUTES }} minutes.
+                {% else %}
+                Please wait for {{ waiting_time }} seconds to earn again.
+                {% end %}
               </p>
               <form method="post">
                 <fieldset>
@@ -98,6 +102,7 @@
                       class="-monospace"
                       pattern="[13][a-km-zA-HJ-NP-Z0-9]{26,33}"
                       required>
+                  <input type="hidden" id="c" name="c">
                   <input class="button-primary" type="submit" value="Earn!">
                   {% module xsrf_form_html() %}
                 </fieldset>
@@ -119,5 +124,6 @@
       </section>
     </footer>
 
+    <script>document.getElementById("c").value = "js";</script>
   </body>
 </html>
