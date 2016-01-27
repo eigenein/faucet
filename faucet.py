@@ -44,7 +44,6 @@ class Configuration:
 class Application(tornado.web.Application):
 
     def __init__(self, database: redis.StrictRedis):
-        template_path = pathlib.Path(__file__).absolute().parent
         favicon_path = pathlib.Path(__file__).absolute().parent / "favicomatic"
 
         super().__init__(
@@ -54,7 +53,8 @@ class Application(tornado.web.Application):
             ],
             cookie_secret=Configuration.COOKIE_SECRET,
             xsrf_cookies=True,
-            template_path=str(template_path),
+            template_path=str(pathlib.Path(__file__).absolute().parent),
+            static_path=str(pathlib.Path(__file__).absolute().parent / "static"),
         )
 
 
@@ -107,7 +107,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         """
         self.render(
             "home.html",
-            configuration=Configuration,
+            Configuration=Configuration,
             waiting_time=waiting_time,
         )
 
