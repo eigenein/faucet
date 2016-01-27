@@ -29,9 +29,16 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         template_path = pathlib.Path(__file__).absolute().parent
+        favicon_path = pathlib.Path(__file__).absolute().parent / "favicomatic"
+
         logging.debug("Template path is set to: %s", template_path)
+        logging.debug("Favicon path is set to: %s", favicon_path)
+
         super().__init__(
-            [(r"/", HomeRequestHandler)],
+            [
+                (r"/", HomeRequestHandler),
+                (r"/((apple-touch-icon|favicon|mstile).*)", tornado.web.StaticFileHandler, {"path": str(favicon_path)}),
+            ],
             cookie_secret=Configuration.COOKIE_SECRET,
             xsrf_cookies=True,
             template_path=str(template_path),
@@ -42,6 +49,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
 
     LAST_SENT_TIMESTAMP_COOKIE = "lst"
 
+    @tornado.web.removeslash
     def get(self):
         # TODO: test and set cookie.
         self.render("home.html")
