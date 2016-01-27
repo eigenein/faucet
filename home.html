@@ -1,0 +1,98 @@
+<!doctype html>
+{% set author = "Pavel Perestoronin" %}
+{% set title = "Earn free Bitcoins" %}
+{% set description = "Earn and instantly withdraw Bitcoins for free." %}
+{% set url = "https://bitcoin.eigenein.xyz" %}
+<html lang="en" class="-stretch-vertical">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="https://eigenein.xyz/">
+    <meta name="description" content="{{ description }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:locale" content="en">
+    <meta property="og:site_name" content="{{ title }}">
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url }}">
+    <meta property="article:author" content="{{ author }}">
+    <meta property="article:section" content="website">
+    <meta name="twitter:domain" content="{{ title }}">
+    <meta name="twitter:url" content="{{ url }}">
+    <meta name="twitter:site" content="{{ url }}">
+    <meta name="twitter:creator" content="{{ author }}">
+    <meta name="twitter:title" content="{{ title }}">
+    <meta name="twitter:description" content="{{ description }}">
+    <title>{{ title }}</title>
+    <link rel="canonical" href="{{ url }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.0.3/milligram.min.css">
+
+    <style>
+      .-align-center { text-align: center; }
+      .-stretch-vertical { height: 100%; }
+      .-monospace { font-family: Menlo, Consolas, "Bitstream Vera Sans Mono", "DejaVu Sans Mono", Monaco, monospace; }
+      .content-footer { position: absolute; bottom: 3rem; width: 100%; }
+      .content-container { display: table; width: 100%; }
+      .content-container > .content { display: table-cell; vertical-align: middle; }
+      .ad-container { position: absolute; top: 3rem; width: 100%; text-align: center; }
+      .ad { width: 120px; height: 90px; background: lightgrey; display: inline-block; }
+      ._half-width { width: 50% !important; }
+    </style>
+  </head>
+  <body class="-stretch-vertical">
+
+    <aside class="ad-container">
+      <section class="container">
+        <div class="ad"></div>
+        <div class="ad"></div>
+        <div class="ad"></div>
+        <div class="ad"></div>
+        <div class="ad"></div>
+        <div class="ad"></div>
+        <div class="ad"></div>
+      </section>
+    </aside>
+
+    <main class="-stretch-vertical">
+      <section class="-stretch-vertical">
+        <div class="content-container -stretch-vertical">
+          <div class="content -align-center">
+
+            <div class="container _half-width">
+              <h1>{{ title }}</h1>
+              <p>
+                Enter you <a href="https://bitcoin.org" target="_blank">Bitcoin</a> wallet address and earn a few <abbr title="1 Bit is 0.000001 BTC">Bits</abbr> instantly.<br>
+                You can do that over and over each 30 minutes.
+              </p>
+              <form method="post">
+                <fieldset>
+                  <input
+                      type="text"
+                      placeholder="Wallet address"
+                      id="wallet_address_input"
+                      name="wallet_address"
+                      class="-monospace"
+                      pattern="[13][a-km-zA-HJ-NP-Z0-9]{26,33}"
+                      required>
+                  <input class="button-primary" type="submit" value="Earn!">
+                  {% module xsrf_form_html() %}
+                </fieldset>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="content-footer">
+      <section class="container -align-center">
+        <p>&copy; <a href="https://eigenein.xyz">Pavel Perestoronin</a></p>
+      </section>
+    </footer>
+
+  </body>
+</html>
