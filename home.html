@@ -90,7 +90,8 @@
                 {% if waiting_time > 0 %}
                 <span id="wait">Please wait <span id="waiting_time" class="-strong">{{ math.ceil(waiting_time) }}</span> seconds to earn again.</span>
                 {% else %}
-                Enter your <a href="https://bitcoin.org" target="_blank">Bitcoin</a> wallet address and earn a few <abbr title="1 Bit is 0.000001 BTC">Bits</abbr> instantly.<sup>1</sup><br>
+                Enter your <a href="https://bitcoin.org" target="_blank">Bitcoin</a> wallet address and
+                earn a few <abbr title="1 Bit is 0.000001 BTC">Bits</abbr> instantly.<sup>1</sup><br>
                 You can do that over and over each {{ Configuration.EARN_WAITING_TIME_MINUTES }} minutes.
                 {% end %}
               </p>
@@ -102,13 +103,22 @@
                       id="wallet_address_input"
                       name="wallet_address"
                       class="-monospace"
-                      pattern="[13][a-km-zA-HJ-NP-Z0-9]{26,33}"
+                      value="{{ wallet_address }}"
                       required>
                   <input type="hidden" id="c" name="c">
                   <input class="button-primary" type="submit" value="Earn!">
                   {% module xsrf_form_html() %}
                 </fieldset>
               </form>
+              {% if balance is not None %}
+              <p>
+                Your balance is <span class="-strong">{{ balance }} Bits</span>.
+                {% if balance < Configuration.COINBASE_API_MINIMUM_AMOUNT_BITS %}
+                Earn <span class="-strong">{{ Configuration.COINBASE_API_MINIMUM_AMOUNT_BITS - balance }} Bits</span>
+                more and we'll send you the whole amount.
+                {% end %}
+              </p>
+              {% end %}
             </div>
 
           </div>
@@ -121,7 +131,8 @@
         <p>
           <sup>1</sup> No any guarantee since the service is totally free •
           Hosted on <a href="https://m.do.co/c/af634cb0cc20" target="_blank">DigitalOcean</a> •
-          &copy; <a href="https://eigenein.xyz">Pavel Perestoronin</a>
+          Payments powered by <a href="https://www.coinbase.com/join/eigenein" target="_blank">Coinbase</a> •
+          <a href="https://telegram.me/eigenein" target="_blank">Contact</a>
         </p>
       </section>
     </footer>
