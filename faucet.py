@@ -44,7 +44,7 @@ class Configuration:
     # Game balance.
     EARN_WAITING_TIME_MINUTES = 1
     EARN_WAITING_TIME = 60.0 * EARN_WAITING_TIME_MINUTES
-    EARN_AMOUNT_BITS = 1
+    EARN_AMOUNT_BITS = 100
     # Redis.
     REDIS_EARN_TIME_EXPIRE = 24 * 60 * 60
     REDIS_EARN_TIME_KEY_FORMAT = "faucet:%s:earn_time"
