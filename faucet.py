@@ -4,7 +4,6 @@
 import decimal
 import hashlib
 import hmac
-import http
 import json
 import logging
 import pathlib
@@ -104,7 +103,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
     def post(self):
         if self.get_body_argument("c") != "js":
             # This is either a robot or a human with disabled JavaScript.
-            raise tornado.web.HTTPError(http.HTTPStatus.BAD_REQUEST.value, "Are you a bot?")
+            raise tornado.web.HTTPError(400, "Are you a bot?")
 
         # Let's initialize the wallet info.
         wallet_address = self.get_body_argument("wallet_address")
@@ -201,7 +200,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         )
         response_body = http_response.body.decode("utf-8")
 
-        if http_response.code in (http.HTTPStatus.OK.value, http.HTTPStatus.CREATED.value):
+        if http_response.code in (200, 201):
             response = json.loads(response_body)
             logging.info("Successfully sent money to %s. Transaction %s.", wallet_address, response["data"]["id"])
             return True
