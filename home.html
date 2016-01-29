@@ -1,5 +1,6 @@
 <!doctype html>
 {% import math %}
+{% import random %}
 {% set author = "Pavel Perestoronin" %}
 {% set title = "Faucet | Earn free Bitcoins" %}
 {% set description = "Earn and instantly withdraw Bitcoins for free." %}
@@ -82,6 +83,7 @@
 
     <aside class="ad-container">
       <section class="container">
+        {% if random.randint(0, 1) %}
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
@@ -89,6 +91,9 @@
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
         <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        {% else %}
+        <iframe data-aa='124348' src='https://ad.a-ads.com/124348?size=990x90' scrolling='no' style='width:990px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        {% end %}
       </section>
     </aside>
 
