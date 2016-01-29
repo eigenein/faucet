@@ -10,7 +10,6 @@ import logging
 import pathlib
 import pickle
 import time
-import typing
 
 import click
 import redis
@@ -161,7 +160,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         return earn_time + Configuration.EARN_WAITING_TIME - time.time()
 
     @staticmethod
-    def safe_loads(bytes_object: typing.Optional[bytes], default):
+    def safe_loads(bytes_object, default):
         return pickle.loads(bytes_object) if bytes_object is not None else default
 
     @tornado.gen.coroutine
