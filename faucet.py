@@ -24,7 +24,7 @@ class Configuration:
     COINBASE_API_KEY = "dOjIYwTJClFK7pt6"
     COINBASE_API_SECRET = b"yHnBgl62iUkpVGEs6NTUCoabejWsyP1D"
     COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/6f38ec6a-4f69-5e5e-aa27-7cac4a7227cd/transactions"
-    COINBASE_API_TRANSACTIONS_URL = "https://api.sandbox.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
+    COINBASE_API_TRANSACTIONS_URL = "https://api.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
     # Coinbase other.
     COINBASE_API_VERSION = "2016-01-27"
     COINBASE_API_MINIMUM_AMOUNT_BITS = 100
