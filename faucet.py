@@ -217,7 +217,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
 
 
 @click.command()
-@click.option("-l", "--log-file", help="Log file.", type=click.File("wt", encoding="utf-8"))
+@click.option("-l", "--log-file", help="Log file.", type=click.File("at", encoding="utf-8"))
 @click.option("-v", "--verbose", is_flag=True, help="Increase verbosity.")
 def main(log_file, verbose: bool):
     """
