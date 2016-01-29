@@ -84,19 +84,19 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         # noinspection PyAttributeOutsideInit
         self.database = database
 
-    def render(self, wallet_address="", balance=None, sent_amount=None, **kwargs):
+    def render(self, waiting_time: float, wallet_address="", balance=None, sent_amount=None):
         super().render(
             "home.html",
             Configuration=Configuration,
+            waiting_time=waiting_time,
             wallet_address=wallet_address,
             balance=balance,
             sent_amount=sent_amount,
-            **kwargs
         )
 
     @tornado.web.removeslash
     def get(self):
-        self.render(waiting_time=self.get_cookie_waiting_time())
+        self.render(self.get_cookie_waiting_time())
 
     @tornado.gen.coroutine
     def post(self):
@@ -113,11 +113,11 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         # Check waiting time.
         waiting_time = self.get_cookie_waiting_time()
         if waiting_time > 0.0:
-            self.render(waiting_time=waiting_time, wallet_address=wallet_address, balance=balance)
+            self.render(waiting_time, wallet_address=wallet_address, balance=balance)
             return
         waiting_time = self.get_waiting_time(self.safe_loads(self.database.get(wallet_earn_time_key), 0.0))
         if waiting_time > 0.0:
-            self.render(waiting_time=waiting_time, wallet_address=wallet_address, balance=balance)
+            self.render(waiting_time, wallet_address=wallet_address, balance=balance)
             return
 
         # All checks passed. Increment balance.
@@ -141,7 +141,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
 
         # Render the page. We know that we've just sent money.
         self.render(
-            waiting_time=Configuration.EARN_WAITING_TIME,
+            Configuration.EARN_WAITING_TIME,
             wallet_address=wallet_address,
             balance=balance,
             sent_amount=sent_amount,
