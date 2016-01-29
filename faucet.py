@@ -23,14 +23,9 @@ import tornado.web
 
 class Configuration:
     # Coinbase API production.
-    # TODO: COINBASE_API_KEY = "dOjIYwTJClFK7pt6"
-    # TODO: COINBASE_API_SECRET = b"yHnBgl62iUkpVGEs6NTUCoabejWsyP1D"
-    # TODO: COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/ac5b48f8-648e-5668-bf9f-6b8e980fe2e1/transactions"
-    # TODO: COINBASE_API_TRANSACTIONS_URL = "https://api.sandbox.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
-    # Coinbase API sandbox.
-    COINBASE_API_KEY = "PmfEFl20TP27qoLB"
-    COINBASE_API_SECRET = b"68UgM07f3XIK49Eglj0BAVfxFSoyR4qH"
-    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/ac5b48f8-648e-5668-bf9f-6b8e980fe2e1/transactions"
+    COINBASE_API_KEY = "dOjIYwTJClFK7pt6"
+    COINBASE_API_SECRET = b"yHnBgl62iUkpVGEs6NTUCoabejWsyP1D"
+    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/6f38ec6a-4f69-5e5e-aa27-7cac4a7227cd/transactions"
     COINBASE_API_TRANSACTIONS_URL = "https://api.sandbox.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
     # Coinbase other.
     COINBASE_API_VERSION = "2016-01-27"
@@ -50,22 +45,27 @@ class Configuration:
     # Game balance.
     EARN_WAITING_TIME_MINUTES = 1  # TODO: adjust.
     EARN_WAITING_TIME = 60.0 * EARN_WAITING_TIME_MINUTES
-    EARN_AMOUNT_BITS = 1  # TODO: adjust.
+    EARN_AMOUNT_BITS = 51  # TODO: adjust.
     # Redis.
     REDIS_EARN_TIME_EXPIRE = 24 * 60 * 60
     REDIS_EARN_TIME_KEY_FORMAT = "faucet:%s:earn_time"
     REDIS_BALANCE_KEY_FORMAT = "faucet:%s:balance"
     REDIS_BALANCE_EXPIRE = 30 * 24 * 60 * 60
+    # Coinbase API sandbox.
+    # COINBASE_API_KEY = "PmfEFl20TP27qoLB"
+    # COINBASE_API_SECRET = b"68UgM07f3XIK49Eglj0BAVfxFSoyR4qH"
+    # COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/ac5b48f8-648e-5668-bf9f-6b8e980fe2e1/transactions"
+    # COINBASE_API_TRANSACTIONS_URL = "https://api.sandbox.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
 
 
 class Application(tornado.web.Application):
 
-    def __init__(self, database: redis.StrictRedis, http_client: tornado.httpclient.AsyncHTTPClient):
+    def __init__(self, database: redis.StrictRedis):
         favicon_path = pathlib.Path(__file__).absolute().parent / "favicomatic"
 
         super().__init__(
             [
-                (r"/", HomeRequestHandler, {"database": database, "http_client": http_client}),
+                (r"/", HomeRequestHandler, {"database": database}),
                 (r"/((apple-touch-icon|favicon|mstile).*)", tornado.web.StaticFileHandler, {"path": str(favicon_path)}),
             ],
             cookie_secret=Configuration.COOKIE_SECRET,
@@ -81,18 +81,17 @@ class HomeRequestHandler(tornado.web.RequestHandler):
     bits_in_btc = decimal.Decimal(1000000)
 
     # noinspection PyMethodOverriding
-    def initialize(self, database: redis.StrictRedis, http_client: tornado.httpclient.AsyncHTTPClient):
+    def initialize(self, database: redis.StrictRedis):
         # noinspection PyAttributeOutsideInit
         self.database = database
-        # noinspection PyAttributeOutsideInit
-        self.http_client = http_client
 
-    def render(self, wallet_address="", balance=None, **kwargs):
+    def render(self, wallet_address="", balance=None, sent_amount=None, **kwargs):
         super().render(
             "home.html",
             Configuration=Configuration,
             wallet_address=wallet_address,
             balance=balance,
+            sent_amount=sent_amount,
             **kwargs
         )
 
@@ -126,6 +125,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         # All checks passed. Increment balance.
         logging.info("Incrementing balance for %s (was %s Bits).", wallet_address, balance)
         balance += Configuration.EARN_AMOUNT_BITS
+        sent_amount = 0
         # Save the balance to be on safe side.
         self.database.set(wallet_balance_key, pickle.dumps(balance), ex=Configuration.REDIS_BALANCE_EXPIRE)
         if balance >= Configuration.COINBASE_API_MINIMUM_AMOUNT_BITS:
@@ -134,7 +134,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
             if (yield self.send_money(wallet_address, balance)):
                 # Success.
                 self.database.delete(wallet_balance_key)
-                balance = 0
+                sent_amount, balance = balance, 0
 
         # Remember last earn time for the wallet and cookie.
         cookie = pickle.dumps(time.time())
@@ -146,7 +146,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
             waiting_time=Configuration.EARN_WAITING_TIME,
             wallet_address=wallet_address,
             balance=balance,
-            # TODO: pass success/error flag to render a notification.
+            sent_amount=sent_amount,
         )
 
     def get_cookie_waiting_time(self) -> float:
@@ -176,7 +176,7 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         })
         timestamp = str(int(time.time()))
 
-        http_response = yield self.http_client.fetch(
+        http_response = yield tornado.httpclient.AsyncHTTPClient().fetch(
             tornado.httpclient.HTTPRequest(
                 Configuration.COINBASE_API_TRANSACTIONS_URL,
                 method="POST",
@@ -233,7 +233,7 @@ def main(log_file, verbose: bool):
     )
 
     logging.info("Starting application on port %s…", Configuration.HTTP_PORT)
-    Application(redis.StrictRedis(), tornado.httpclient.AsyncHTTPClient()).listen(Configuration.HTTP_PORT)
+    Application(redis.StrictRedis()).listen(Configuration.HTTP_PORT)
     tornado.ioloop.IOLoop.current().start()
 
 

@@ -57,11 +57,15 @@
       .-stretch-vertical { height: 100%; }
       .-monospace { font-family: Menlo, Consolas, "Bitstream Vera Sans Mono", "DejaVu Sans Mono", Monaco, monospace; }
       .-strong { font-weight: bold; }
+      .-hide { display: none; }
+      .-large { font-size: 3rem; line-height: 3.6rem; }
       .content-footer { position: absolute; bottom: 3rem; width: 100%; }
       .content-container { display: table; width: 100%; }
       .content-container > .content { display: table-cell; vertical-align: middle; }
       .ad-container { position: absolute; top: 3rem; width: 100%; text-align: center; }
       .ad { width: 120px; height: 90px; background: lightgrey; display: inline-block; }
+      .notification-container { background: rgba(255, 255, 255, 0.8); position: absolute; width: 100%; top: 0; z-index: 100; }
+      .notification { background: white; border-radius: 0.4rem; border: 1px solid #9b4dca; padding: 2rem; }
       ._half-width { width: 50% !important; }
     </style>
   </head>
@@ -69,13 +73,13 @@
 
     <aside class="ad-container">
       <section class="container">
-        <div class="ad"></div>
-        <div class="ad"></div>
-        <div class="ad"></div>
-        <div class="ad"></div>
-        <div class="ad"></div>
-        <div class="ad"></div>
-        <div class="ad"></div>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
+        <iframe data-aa='123444' src='https://ad.a-ads.com/123444?size=120x90' scrolling='no' style='width:120px; height:90px; border:0px; padding:0;overflow:hidden' allowtransparency='true' frameborder='0'></iframe>
       </section>
     </aside>
 
@@ -121,6 +125,23 @@
               {% end %}
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      <section id="notification" class="-stretch-vertical{% if not sent_amount %} -hide{% end %}">
+        <div
+          class="content-container notification-container -stretch-vertical"
+          onclick="document.getElementById('notification').style.display = 'none';">
+
+          <div class="content">
+            <div class="notification container -align-center _half-width">
+              <span class="-large">
+                <span class="-strong">{{ sent_amount }} Bits</span> have been just sent to your wallet!
+              </span>
+              <div>Once the network will confirm the transaction you'll see updated balance.</div>
+              <div>In the meantime you can continue earning as usual.</div>
+            </div>
           </div>
         </div>
       </section>
