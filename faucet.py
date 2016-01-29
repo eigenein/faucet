@@ -35,12 +35,13 @@ class Configuration:
     # Web server.
     HTTP_PORT = 8080
     # Logging.
-    LOG_FORMAT = " ".join((
+    LOG_FORMAT_TTY = " ".join((
         click.style("%(asctime)s", dim=True),
         click.style("%(module)s", fg="green"),
         click.style("[%(levelname)s]", fg="cyan"),
         click.style("%(message)s", bold=True),
     ))
+    LOG_FORMAT = "%(asctime)s %(module)s [%(levelname)s] %(message)s"
     # Game balance.
     EARN_WAITING_TIME_MINUTES = 1  # TODO: adjust.
     EARN_WAITING_TIME = 60.0 * EARN_WAITING_TIME_MINUTES
@@ -215,8 +216,6 @@ class HomeRequestHandler(tornado.web.RequestHandler):
         return False
 
 
-
-
 @click.command()
 @click.option("-l", "--log-file", help="Log file.", type=click.File("wt", encoding="utf-8"))
 @click.option("-v", "--verbose", is_flag=True, help="Increase verbosity.")
@@ -225,10 +224,11 @@ def main(log_file, verbose: bool):
     Bitcoin Faucet Application.
     """
 
+    log_file = log_file or click.get_text_stream("stderr")
     logging.basicConfig(
-        format=Configuration.LOG_FORMAT,
+        format=(Configuration.LOG_FORMAT_TTY if log_file.isatty() else Configuration.LOG_FORMAT),
         level=(logging.DEBUG if verbose else logging.INFO),
-        stream=(log_file or click.get_text_stream("stderr")),
+        stream=log_file,
     )
 
     logging.info("Starting application on port %s…", Configuration.HTTP_PORT)
