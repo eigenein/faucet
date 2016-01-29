@@ -42,9 +42,9 @@ class Configuration:
     ))
     LOG_FORMAT = "%(asctime)s %(module)s [%(levelname)s] %(message)s"
     # Game balance.
-    EARN_WAITING_TIME_MINUTES = 1  # TODO: adjust.
+    EARN_WAITING_TIME_MINUTES = 1
     EARN_WAITING_TIME = 60.0 * EARN_WAITING_TIME_MINUTES
-    EARN_AMOUNT_BITS = 51  # TODO: adjust.
+    EARN_AMOUNT_BITS = 1
     # Redis.
     REDIS_EARN_TIME_EXPIRE = 24 * 60 * 60
     REDIS_EARN_TIME_KEY_FORMAT = "faucet:%s:earn_time"
@@ -96,7 +96,6 @@ class HomeRequestHandler(tornado.web.RequestHandler):
 
     @tornado.web.removeslash
     def get(self):
-        # TODO: set referrer cookie.
         self.render(waiting_time=self.get_cookie_waiting_time())
 
     @tornado.gen.coroutine
