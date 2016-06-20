@@ -21,9 +21,9 @@ import tornado.web
 
 class Configuration:
     # Coinbase API production.
-    COINBASE_API_KEY = "dOjIYwTJClFK7pt6"
-    COINBASE_API_SECRET = b"yHnBgl62iUkpVGEs6NTUCoabejWsyP1D"
-    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/6f38ec6a-4f69-5e5e-aa27-7cac4a7227cd/transactions"
+    COINBASE_API_KEY = "…"
+    COINBASE_API_SECRET = b"…"
+    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/…/transactions"
     COINBASE_API_TRANSACTIONS_URL = "https://api.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
     # Coinbase other.
     COINBASE_API_VERSION = "2016-01-27"
@@ -51,9 +51,9 @@ class Configuration:
     REDIS_BALANCE_KEY_FORMAT = "faucet:%s:balance"
     REDIS_BALANCE_EXPIRE = 30 * 24 * 60 * 60
     # Coinbase API sandbox.
-    # COINBASE_API_KEY = "PmfEFl20TP27qoLB"
-    # COINBASE_API_SECRET = b"68UgM07f3XIK49Eglj0BAVfxFSoyR4qH"
-    # COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/ac5b48f8-648e-5668-bf9f-6b8e980fe2e1/transactions"
+    # COINBASE_API_KEY = "…"
+    # COINBASE_API_SECRET = b"…"
+    # COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/…/transactions"
     # COINBASE_API_TRANSACTIONS_URL = "https://api.sandbox.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
 
 
