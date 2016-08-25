@@ -21,9 +21,9 @@ import tornado.web
 
 class Configuration:
     # Coinbase API production.
-    COINBASE_API_KEY = "…"
-    COINBASE_API_SECRET = b"…"
-    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts/…/transactions"
+    COINBASE_API_KEY = b""
+    COINBASE_API_SECRET = b""
+    COINBASE_API_TRANSACTIONS_PATH = "/v2/accounts//transactions"
     COINBASE_API_TRANSACTIONS_URL = "https://api.coinbase.com" + COINBASE_API_TRANSACTIONS_PATH
     # Coinbase other.
     COINBASE_API_VERSION = "2016-01-27"
